@@ -1,0 +1,71 @@
+local Players = {}
+
+
+local function CreateBillBoard(Parent, Text)
+	local Billboard = Instance.new("BillboardGui", Parent)
+	Billboard.AlwaysOnTop = true
+	Billboard.MaxDistance = math.huge
+	Billboard.Size = UDim2.new(20, 300,2, 10)
+	Billboard.ExtentsOffsetWorldSpace = Vector3.new(0,5,0)
+	Billboard.ZIndexBehavior = Enum.ZIndexBehavior.Global
+	Billboard.Adornee = Parent
+	Billboard.Name = "ESP2"
+
+	local text = Instance.new("TextBox", Billboard)
+	text.Size = UDim2.new(1,1,1,1)
+	text.Text = Text
+	text.TextColor3 = Color3.fromRGB(46, 255, 0)
+	text.BackgroundTransparency = 1
+	text.TextScaled = true
+
+	return Billboard
+end
+
+local function RefreshPlayers()
+	for i,v in ipairs(workspace:GetChildren()) do
+		if v:FindFirstChild("Head") then
+			if v:FindFirstChild("Head"):IsA("Part") then
+				if v:FindFirstChild("Head").CFrame then
+					local cf = v:FindFirstChild("Head").CFrame
+					task.wait()
+					if not table.find(Players,v) then
+
+						if v:FindFirstChild("Head"):FindFirstChild("Nametag") then
+							CreateBillBoard(v:FindFirstChild("Head"), v:FindFirstChild("Head").Nametag.tag.Text)
+						else
+							CreateBillBoard(v:FindFirstChild("Head"), "Name not known.")
+						end
+
+						table.insert(Players,v)
+					else
+
+						local prt = table.find(Players,v)
+						if prt.Head:FindFirstChild("ESP2") then
+							prt.Head:FindFirstChild("ESP2"):Destroy()
+							if prt:FindFirstChild("Head"):FindFirstChild("Nametag") then
+								CreateBillBoard(prt:FindFirstChild("Head"), prt:FindFirstChild("Head").Nametag.tag.Text)
+							else
+								CreateBillBoard(prt:FindFirstChild("Head"), "Name not known.")
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+end
+
+
+game:GetService("UserInputService").InputBegan:Connect(function(key)
+	if key.KeyCode == Enum.KeyCode.P then
+		RefreshPlayers()
+
+		for i,v in ipairs(Players) do
+			print(i,v)
+			for i,v2 in ipairs(v:GetDescendants()) do
+				print(v2.Name)
+			end
+		end
+	end
+end)
+
